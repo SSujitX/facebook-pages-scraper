@@ -1,3 +1,6 @@
+[![PyPI version](https://badge.fury.io/py/facebook-pages-scraper.svg)](https://badge.fury.io/py/facebook-pages-scraper)
+[![Python Versions](https://img.shields.io/pypi/pyversions/facebook-pages-scraper.svg)](https://pypi.org/project/facebook-pages-scraper/)
+
 # Facebook Page Scraper
 
 **Facebook Page Scraper** is a Python package designed to extract comprehensive information from Facebook pages. Whether you're looking to gather general page details or delve into specific profile information, this tool simplifies the process, saving you time and effort. Easily integrate it into your projects to collect data such as page name, URL, profile picture, number of likes, followers, and more.
@@ -5,6 +8,20 @@
 With Facebook Page Scraper, you can efficiently scrape Facebook page data in various formats. If you're looking for a **Facebook page scraper**, a **Facebook page info scraper in Python**, or an easy way to **scrape Facebook page info**, this tool has you covered. It's also ideal for developers who need to **extract Facebook page information** or **scrape Facebook data** using Python. You can even find it on **GitHub** and integrate it into your project seamlessly.
 
 If you find this package useful, please support the project by giving it a star on [GitHub](https://github.com/SSujitX/facebook-page-scraper). Your support helps in maintaining and enhancing the project!
+
+### Features:
+
+- **Initial Release - Facebook Page Scraper v0.0.1**
+- **Page Name & URL Extraction**: Easily extract the name and URL of the Facebook page.
+- **Profile Picture Scraping**: Retrieve the profile picture associated with the page.
+- **Likes & Followers Count**: Get the number of likes and followers for the page.
+- **Category Information**: Scrape the page's category (e.g., App Page, Product/Service).
+- **Email & Phone**: Extract associated email addresses and phone numbers (if available).
+- **Website & Social Media Links**: Retrieve website links and social media profiles connected to the page.
+- **Business Hours & Services**: Scrape business hours and services (where applicable).
+- **Simple Integration**: Built with ease of use in mind, allowing quick integration into Python projects for Facebook page data automation.
+
+This release lays the foundation for future updates and enhancements, providing developers with a reliable way to gather Facebook page data programmatically.
 
 ## Installation
 
