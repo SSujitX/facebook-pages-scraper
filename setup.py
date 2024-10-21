@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="facebook-page-scraper",
+    name="facebook-pages-scraper",
     version="0.0.1",
     description="Facebook page scraper is a python package that helps you scrape data from facebook page.",
     long_description=long_description,
