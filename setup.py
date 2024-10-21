@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="googlenewsdecoder",
-    version="0.1.6",
-    description="A Python package to decode Google News URLs to their original sources.",
+    name="facebook-page-scraper",
+    version="0.1.0",
+    description="A Python package to scrape and extract comprehensive information from Facebook pages.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/SSujitX/google-news-url-decoder",
+    url="https://github.com/SSujitX/facebook-page-scraper",
     author="Sujit Biswas",
     author_email="ssujitxx@gmail.com",
     license="MIT",
@@ -20,11 +20,11 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    keywords="google news decoder",
+    keywords="facebook page scraper, scrape facebook page info, facebook data scraper, facebook page info extractor, python facebook scraper",
     project_urls={
-        "Bug Tracker": "https://github.com/SSujitX/google-news-url-decoder/issues",
-        "Documentation": "https://github.com/SSujitX/google-news-url-decoder#readme",
-        "Source Code": "https://github.com/SSujitX/google-news-url-decoder",
+        "Bug Tracker": "https://github.com/SSujitX/facebook-page-scraper/issues",
+        "Documentation": "https://github.com/SSujitX/facebook-page-scraper#readme",
+        "Source Code": "https://github.com/SSujitX/facebook-page-scraper",
     },
     python_requires=">=3.9",
 )
