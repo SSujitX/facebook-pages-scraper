@@ -1,0 +1,4 @@
+curl_cffi
+selectolax
+setuptools
+rich
