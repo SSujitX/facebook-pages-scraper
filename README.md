@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper)](https://pepy.tech/project/facebook-pages-scraper)
->>>>>>> bb33ed6ec729bc87de2aae0a53ba702c0f41e454
 [![PyPI version](https://badge.fury.io/py/facebook-pages-scraper.svg)](https://badge.fury.io/py/facebook-pages-scraper)
 [![Python Versions](https://img.shields.io/pypi/pyversions/facebook-pages-scraper.svg)](https://pypi.org/project/facebook-pages-scraper/)
 
