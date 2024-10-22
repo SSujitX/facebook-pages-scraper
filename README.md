@@ -1,5 +1,8 @@
 [![PyPI version](https://badge.fury.io/py/facebook-pages-scraper.svg)](https://badge.fury.io/py/facebook-pages-scraper)
 [![Python Versions](https://img.shields.io/badge/python-3.9-blue)](https://pypi.org/project/facebook-pages-scraper/)
+[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper)](https://pepy.tech/project/facebook-pages-scraper)
+[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/month)](https://pepy.tech/project/facebook-pages-scraper)
+[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/week)](https://pepy.tech/project/facebook-pages-scraper)
 
 # Facebook Page Scraper
 
