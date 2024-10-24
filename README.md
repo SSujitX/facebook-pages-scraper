@@ -3,6 +3,7 @@
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper)](https://pepy.tech/project/facebook-pages-scraper)
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/month)](https://pepy.tech/project/facebook-pages-scraper)
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/week)](https://pepy.tech/project/facebook-pages-scraper)
+![](https://api.visitorbadge.io/api/VisitorHit?user=SSujitX&facebook-pages-scraper&countColor=%237B1E7A)
 
 # Facebook Page Scraper
 
