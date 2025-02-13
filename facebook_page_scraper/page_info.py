@@ -1,7 +1,8 @@
 # facebook_page_scraper/page_info.py
 
+
 from typing import Optional, Dict
-from .request_handler import RequestHandler
+from .request_handler import RequestHandler, HTMLParser, re
 
 
 class PageInfo:
@@ -56,10 +57,12 @@ class PageInfo:
             html_content, "profile_tile_items"
         )
         self.profile_info = self.extract_profile_info(profile_info_json)
+        
+        self.meta_html_info = self.extract_html_data(html_content)
 
         # Combine both into one dictionary
         if self.general_info and self.profile_info:
-            combined_info = {**self.general_info, **self.profile_info}
+            combined_info = {**self.general_info, **self.meta_html_info, **self.profile_info}
             return combined_info
         elif self.general_info:
             return self.general_info
@@ -84,6 +87,8 @@ class PageInfo:
             "profile_pic": None,
             "page_likes": None,
             "page_followers": None,
+            "page_id" : None,
+            "is_business_page" : None
         }
 
         try:
@@ -104,6 +109,11 @@ class PageInfo:
 
                     general_info["page_name"] = user.get("name")
                     general_info["page_url"] = user.get("url")
+                    
+                    general_info["page_id"] = user.get("delegate_page", {}).get("id")
+                    
+                    general_info["is_business_page"] = user.get("delegate_page", {}).get("is_business_page_active")
+                    
                     general_info["profile_pic"] = (
                         user.get("profilePicLarge", {}).get("uri")
                         or user.get("profilePicMedium", {}).get("uri")
@@ -206,6 +216,51 @@ class PageInfo:
         except (IndexError, KeyError, TypeError, ValueError) as e:
             print(f"Error extracting profile information: {e}")
             return profile_info
+
+    def extract_html_data(self, html_content: HTMLParser) -> Dict[str, Optional[str]]:
+        """Extracts the JSON data from the HTML content. 
+        
+        Args:
+            html_content (str): The raw HTML content of the page.
+        
+        Returns:
+            dict: A dictionary with the extracted JSON data.
+        """
+        meta_data = {
+                    "page_likes_count": None,
+                    "page_talking_count": None,
+                    "page_were_here_count": None,
+                }
+        
+        try:
+
+            meta_description = html_content.css_first("meta[name=description]").attrs.get("content") if html_content.css_first("meta[name=description]") else None
+            
+            if not meta_description:
+                return meta_data
+            
+            like_pattern = r"(?P<likes>[\d,]+)\s+likes"
+            like_match = re.search(like_pattern, meta_description)
+            likes = like_match.group("likes") if like_match else None
+
+            talking_pattern = r"(?P<talking>[\d,]+)\s+talking about this"
+            talking_match = re.search(talking_pattern, meta_description)
+            talking = talking_match.group("talking") if talking_match else None
+
+            were_pattern = r"(?P<were>[\d,]+)\s+were here"
+            were_match = re.search(were_pattern, meta_description)
+            were = were_match.group("were") if were_match else None
+
+            meta_data["page_likes_count"] = likes
+            meta_data["page_talking_count"] = talking
+            meta_data["page_were_here_count"] = were
+            
+            return meta_data
+        
+        except Exception as e:
+            print(
+                f"Unexpected error in (extract_html_data) func: {e}")
+            return meta_data
 
     @classmethod
     def PageInfo(cls, url: str) -> Optional[Dict[str, Optional[str]]]:

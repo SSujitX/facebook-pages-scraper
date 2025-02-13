@@ -4,7 +4,7 @@ from curl_cffi import requests
 from selectolax.parser import HTMLParser
 import json
 import sys
-
+import re
 
 class RequestHandler:
     def __init__(self):
@@ -41,12 +41,12 @@ class RequestHandler:
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
-            return response.text
+            return HTMLParser(response.text)
         except Exception as e:
             print(f"Error fetching the page [{url}]: {e}")
             sys.exit(1)
 
-    def parse_json_from_html(self, html_content: str, key_to_find: str) -> dict:
+    def parse_json_from_html(self, html_content: HTMLParser, key_to_find: str) -> dict:
         """
         Parses JSON data from HTML by extracting the relevant script block.
 
@@ -61,7 +61,7 @@ class RequestHandler:
             SystemExit: If no valid data is found or parsing fails.
         """
         try:
-            parser = HTMLParser(html_content)
+            parser = html_content
             for script in parser.css('script[type="application/json"]'):
                 script_text = script.text(strip=True)
                 if key_to_find in script_text:
