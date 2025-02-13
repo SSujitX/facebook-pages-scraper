@@ -62,7 +62,7 @@ from facebook_page_scraper import FacebookPageScraper
 from rich.pretty import pprint
 
 def main():
-    urls = "https://www.facebook.com/pizzaburgbd"
+    url = "https://www.facebook.com/pizzaburgbd"
 
     pprint(f">= Scraping URL/Username: {url}")
 
