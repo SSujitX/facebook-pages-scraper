@@ -1,5 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/facebook-pages-scraper.svg)](https://badge.fury.io/py/facebook-pages-scraper)
-[![Python Versions](https://img.shields.io/badge/python-3.9-blue)](https://pypi.org/project/facebook-pages-scraper/)
+[![Python Versions](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://pypi.org/project/facebook-pages-scraper/)
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper)](https://pepy.tech/project/facebook-pages-scraper)
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/month)](https://pepy.tech/project/facebook-pages-scraper)
 [![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/week)](https://pepy.tech/project/facebook-pages-scraper)
@@ -12,19 +12,30 @@ With Facebook Page Scraper, you can efficiently scrape Facebook page data in var
 
 If you find this package useful, please support the project by giving it a star on [GitHub](https://github.com/SSujitX/facebook-pages-scraper). Your support helps in maintaining and enhancing the project!
 
+## Update
+
+- **Version 0.0.2**:
+  - **Updated**: Added extraction of additional data such as (page_id, is_business_page, page_likes_count, page_talking_count, page_were_here_count).
+  - **Improved**: Enhanced error handling.
+
 ### Features:
 
-- **Initial Release - Facebook Page Scraper v0.0.1**
-- **Page Name & URL Extraction**: Easily extract the name and URL of the Facebook page.
-- **Profile Picture Scraping**: Retrieve the profile picture associated with the page.
-- **Likes & Followers Count**: Get the number of likes and followers for the page.
-- **Category Information**: Scrape the page's category (e.g., App Page, Product/Service).
-- **Email & Phone**: Extract associated email addresses and phone numbers (if available).
-- **Website & Social Media Links**: Retrieve website links and social media profiles connected to the page.
-- **Business Hours & Services**: Scrape business hours and services (where applicable).
-- **Simple Integration**: Built with ease of use in mind, allowing quick integration into Python projects for Facebook page data automation.
-
-This release lays the foundation for future updates and enhancements, providing developers with a reliable way to gather Facebook page data programmatically.
+- **Page Name & URL Extraction**: Easily extract the name and URL of the Facebook page
+- **Profile Picture Access**: Get high-quality profile picture URLs
+- **Basic Metrics**: Extract likes, followers, talking count, and check-ins
+- **Page Identity**: Get page ID and business page status
+- **Detailed Statistics**: Access precise counts for likes, engagements, and visitor metrics
+- **Business Information**:
+  - Category and classification
+  - Physical address
+  - Contact details (phone and email)
+  - Website URL
+  - Operating hours
+  - Price range indicators
+  - Available services
+- **Rating Information**: Access page ratings when available
+- **Social Media Integration**: Retrieve connected social media accounts
+- **Simple Integration**: Easy to integrate into any Python project
 
 ## Installation
 
@@ -48,7 +59,28 @@ The following example demonstrates how to scrape general information from a Face
 
 ```python
 from facebook_page_scraper import FacebookPageScraper
-from rich import print
+from rich.pretty import pprint
+
+def main():
+    urls = "https://www.facebook.com/pizzaburgbd"
+
+    pprint(f">= Scraping URL/Username: {url}")
+
+    page_info = FacebookPageScraper.PageInfo(url)
+    pprint("Page Information:")
+    pprint(page_info)
+    pprint("=" * 80)
+
+if __name__ == "__main__":
+    main()
+```
+
+### Using a for loop to decode multiple URLs
+
+```python
+from facebook_page_scraper import FacebookPageScraper
+from rich.pretty import pprint
+import time
 
 def main():
     urls = [
@@ -56,44 +88,47 @@ def main():
         "https://www.facebook.com/facebook",
         "https://www.facebook.com/MadKingXGaming/",
         "https://www.facebook.com/LinkedIn",
+        "https://www.facebook.com/pizzaburgbd"
     ]
 
     for url in urls:
-        print(f">= Scraping URL/Username: {url}\n")
+        pprint(f">= Scraping URL/Username: {url}")
 
         page_info = FacebookPageScraper.PageInfo(url)
-        print("Page Information:")
-        print(page_info)
-        print("\n" + "=" * 80 + "\n")
+        pprint("Page Information:")
+        pprint(page_info)
+        pprint("=" * 80)
+        time.sleep(2)
 
 
 if __name__ == "__main__":
     main()
-
-
-# Output
-    # >= Scraping URL/Username: /instagram
-    # {
-    #     'page_name': 'Instagram',
-    #     'page_url': 'https://www.facebook.com/instagram',
-    #     'profile_pic':
-    # 'https://scontent.fdac22-2.fna.fbcdn.net/v/t39.30808-1/281523213_5154082218010914_1249949579548042028_n.jpg?stp=dst-jpg_s200x
-    # 200&_nc_cat=1&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=xO9172fM8iwQ7kNvgGJTeKm&_nc_zt=24&_nc_ht=scontent.fdac22-2.fna&_nc_gid=AxLYcAimX
-    # PGqMhaTor0fRo_&oh=00_AYDt0G7UAg72JlSXc_9zHpAJxTV282cZGHpJXePHDa8O5Q&oe=671B59A9',
-    #     'page_likes': '61M likes',
-    #     'page_followers': '68M followers',
-    #     'page_category': 'Page · App Page',
-    #     'page_address': None,
-    #     'page_phone': None,
-    #     'page_email': None,
-    #     'page_website': 'instagram.com',
-    #     'page_business_hours': None,
-    #     'page_business_price': None,
-    #     'page_rating': None,
-    #     'page_services': None,
-    #     'page_social_accounts': None
-    # }
 ```
+
+### Possible output
+
+<!-- {
+│   'page_name': 'PizzaBurg',
+│   'page_url': 'https://www.facebook.com/pizzaburgbd',
+│   'profile_pic': 'https://scontent.fdac22-2.fna.fbcdn.net/v/t39.30808-1/461120046_932810008890332_7328117254384510587_n.jpg?stp=cp6_dst-jpg_s200x200_tt6&_nc_cat=1&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=lMP1pZatZ90Q7kNvgEBx2nl&_nc_oc=AdhqTswSuZ36AUvf955zvso4FUy1qUvAUsTwzwik8lijO-NNmFLmxAhqyDFtGI-rllw&_nc_zt=24&_nc_ht=scontent.fdac22-2.fna&_nc_gid=ADEDzW-U1qvrumGbDCHzumc&oh=00_AYAo2NWsmCr_qa0IZc3Nwj_7K_-DVrgkuidp1PGhvXcFjg&oe=67B3145F',
+│   'page_likes': '412K likes',
+│   'page_followers': '614K followers',
+│   'page_id': '1156899667774877',
+│   'is_business_page': True,
+│   'page_likes_count': '412,723',
+│   'page_talking_count': '26,076',
+│   'page_were_here_count': '64,824',
+│   'page_category': 'Page · Fast food restaurant',
+│   'page_address': 'Avenue Road Section:2 , Block: A, Avenue:1 , House: 12/1, Dhaka 1216, Dhaka, Bangladesh',
+│   'page_phone': '01404-461200',
+│   'page_email': 'pizzaburgofficial@gmail.com',
+│   'page_website': 'pizzaburg.com',
+│   'page_business_hours': 'Closed now',
+│   'page_business_price': 'Price range · £',
+│   'page_rating': None,
+│   'page_services': 'Dine in · In-store collection',
+│   'page_social_accounts': None
+} -->
 
 # Disclaimer
 
