@@ -1,13 +1,20 @@
+import os
 from setuptools import setup, find_packages
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+def get_version():
+    version_file = os.path.join(
+        os.path.dirname(__file__), "facebook_page_scraper", "__version__.py"
+    )
+    with open(version_file, "r") as f:
+        version_vars = {}
+        exec(f.read(), version_vars)
+    return version_vars["__version__"]
 
 setup(
     name="facebook-pages-scraper",
-    version="0.0.1",
-    description="Facebook page scraper is a python package that helps you scrape data from facebook page.",
-    long_description=long_description,
+    version=get_version(),
+    description="Facebook page scraper is a python package that helps you scrape data from facebook pages.",
+    long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/SSujitX/facebook-page-scraper",
     author="Sujit Biswas",

@@ -12,3 +12,4 @@ build/
 
 *.egg-info/
 facebook_page_scraper.py
+test.py
