@@ -107,7 +107,6 @@ if __name__ == "__main__":
 
 ### Possible output
 
-<!-- {
 │   'page_name': 'PizzaBurg',
 │   'page_url': 'https://www.facebook.com/pizzaburgbd',
 │   'profile_pic': 'https://scontent.fdac22-2.fna.fbcdn.net/v/t39.30808-1/461120046_932810008890332_7328117254384510587_n.jpg?stp=cp6_dst-jpg_s200x200_tt6&_nc_cat=1&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=lMP1pZatZ90Q7kNvgEBx2nl&_nc_oc=AdhqTswSuZ36AUvf955zvso4FUy1qUvAUsTwzwik8lijO-NNmFLmxAhqyDFtGI-rllw&_nc_zt=24&_nc_ht=scontent.fdac22-2.fna&_nc_gid=ADEDzW-U1qvrumGbDCHzumc&oh=00_AYAo2NWsmCr_qa0IZc3Nwj_7K_-DVrgkuidp1PGhvXcFjg&oe=67B3145F',
@@ -128,7 +127,7 @@ if __name__ == "__main__":
 │   'page_rating': None,
 │   'page_services': 'Dine in · In-store collection',
 │   'page_social_accounts': None
-} -->
+}
 
 # Disclaimer
 
