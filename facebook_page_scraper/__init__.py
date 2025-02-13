@@ -3,6 +3,7 @@
 from .page_info import PageInfo
 from .page_post_info import PagePostInfo
 from typing import List, Optional, Dict
+from .__version__ import __version__
 
 
 class FacebookPageScraper:
