@@ -127,7 +127,8 @@ if __name__ == "__main__":
 │   'page_rating': None,
 │   'page_services': 'Dine in · In-store collection',
 │   'page_social_accounts': None
-}```
+}
+````
 
 # Disclaimer
 
