@@ -45,7 +45,7 @@ If you find this package useful, please support the project by giving it a star 
 pip install facebook-pages-scraper
 ```
 
-- You can upgrade this package using pip (upgrade to latest version):
+- You can upgrade this package using pip (upgrade to the latest version):
 
 ```sh
 pip install facebook-pages-scraper --upgrade
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     main()
 ```
 
-### Using a for loop to decode multiple URLs
+### Using a for loop to scrape multiple URLs
 
 ```python
 from facebook_page_scraper import FacebookPageScraper
