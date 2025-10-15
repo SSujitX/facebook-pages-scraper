@@ -14,9 +14,11 @@ If you find this package useful, please support the project by giving it a star 
 
 ## Update
 
-- **Version 0.0.2**:
-  - **Updated**: Added extraction of additional data such as (page_id, is_business_page, page_likes_count, page_talking_count, page_were_here_count).
+- **Version 0.0.3**:
+  - **Updated**: Added extraction of additional data such as (cover photo).
   - **Improved**: Enhanced error handling.
+  - **Added**: Initialization of PagePostInfo.
+  - **New Contributor**: @olivier-saugeon made their first contribution.
 
 ### Features:
 
@@ -49,6 +51,12 @@ pip install facebook-pages-scraper
 
 ```sh
 pip install facebook-pages-scraper --upgrade
+```
+
+- Using uv:
+
+```sh
+uv add facebook-pages-scraper -U
 ```
 
 ## Usage
@@ -106,6 +114,7 @@ if __name__ == "__main__":
 ```
 
 ### Possible output
+
 ```sh
 {
 │   'page_name': 'PizzaBurg',
@@ -129,7 +138,7 @@ if __name__ == "__main__":
 │   'page_services': 'Dine in · In-store collection',
 │   'page_social_accounts': None
 }
-````
+```
 
 # Disclaimer
 
@@ -142,5 +151,9 @@ By using Facebook Page Scraper, you acknowledge that:
 You have the right and permission to access the data you are scraping.
 You are solely responsible for how you use this package and for any consequences that may arise.
 The developers of this tool are not liable for any misuse, and it is your responsibility to ensure compliance with Facebook's rules and regulations.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SSujitX/facebook-pages-scraper&type=date&legend=top-left)](https://www.star-history.com/#SSujitX/facebook-pages-scraper&type=date&legend=top-left)
 
 ![](https://api.visitorbadge.io/api/VisitorHit?user=SSujitX&facebook-pages-scraper&countColor=%237B1E7A)
