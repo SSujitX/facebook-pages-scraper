@@ -57,12 +57,16 @@ class PageInfo:
             html_content, "profile_tile_items"
         )
         self.profile_info = self.extract_profile_info(profile_info_json)
-        
+
         self.meta_html_info = self.extract_html_data(html_content)
 
         # Combine both into one dictionary
         if self.general_info and self.profile_info:
-            combined_info = {**self.general_info, **self.meta_html_info, **self.profile_info}
+            combined_info = {
+                **self.general_info,
+                **self.meta_html_info,
+                **self.profile_info,
+            }
             return combined_info
         elif self.general_info:
             return self.general_info
@@ -88,8 +92,8 @@ class PageInfo:
             "cover_photo": None,
             "page_likes": None,
             "page_followers": None,
-            "page_id" : None,
-            "is_business_page" : None
+            "page_id": None,
+            "is_business_page": None,
         }
 
         try:
@@ -110,34 +114,50 @@ class PageInfo:
 
                     general_info["page_name"] = user.get("name")
                     general_info["page_url"] = user.get("url")
-                    
-                    general_info["page_id"] = user.get("delegate_page", {}).get("id")
-                    
-                    general_info["is_business_page"] = user.get("delegate_page", {}).get("is_business_page_active")
+
+                    delegate_page = user.get("delegate_page")
+                    if delegate_page is not None:
+                        general_info["page_id"] = delegate_page.get("id")
+                        general_info["is_business_page"] = delegate_page.get(
+                            "is_business_page_active"
+                        )
 
                     general_info["profile_pic"] = (
                         user.get("profilePicLarge", {}).get("uri")
                         or user.get("profilePicMedium", {}).get("uri")
                         or user.get("profilePicSmall", {}).get("uri")
                     )
-                    
-                    general_info["cover_photo"] = user.get("cover_photo", {}).get("photo", {}).get("image",{}).get("uri")
 
-                    profile_social_contents = user.get(
-                        "profile_social_context", {}
-                    ).get("content", [])
-                    for content in profile_social_contents:
-                        uri = content.get("uri", "")
-                        text = content.get("text", {}).get("text")
-                        if "friends_likes" in uri and not general_info["page_likes"]:
-                            general_info["page_likes"] = text
-                        elif "followers" in uri and not general_info["page_followers"]:
-                            general_info["page_followers"] = text
-                        if (
-                            general_info["page_likes"]
-                            and general_info["page_followers"]
-                        ):
-                            break
+                    general_info["cover_photo"] = (
+                        user.get("cover_photo", {})
+                        .get("photo", {})
+                        .get("image", {})
+                        .get("uri")
+                    )
+                    profile_social_context = user.get("profile_social_context")
+                    if profile_social_context is not None:
+
+                        profile_social_contents = profile_social_context.get(
+                            "content", []
+                        )
+                        for content in profile_social_contents:
+                            uri = content.get("uri", "")
+                            text = content.get("text", {}).get("text")
+                            if (
+                                "friends_likes" in uri
+                                and not general_info["page_likes"]
+                            ):
+                                general_info["page_likes"] = text
+                            elif (
+                                "followers" in uri
+                                and not general_info["page_followers"]
+                            ):
+                                general_info["page_followers"] = text
+                            if (
+                                general_info["page_likes"]
+                                and general_info["page_followers"]
+                            ):
+                                break
             return general_info
         except (IndexError, KeyError, TypeError, ValueError) as e:
             print(f"Error extracting general page information: {e}")
@@ -221,27 +241,31 @@ class PageInfo:
             return profile_info
 
     def extract_html_data(self, html_content: HTMLParser) -> Dict[str, Optional[str]]:
-        """Extracts the JSON data from the HTML content. 
-        
+        """Extracts the JSON data from the HTML content.
+
         Args:
             html_content (str): The raw HTML content of the page.
-        
+
         Returns:
             dict: A dictionary with the extracted JSON data.
         """
         meta_data = {
-                    "page_likes_count": None,
-                    "page_talking_count": None,
-                    "page_were_here_count": None,
-                }
-        
+            "page_likes_count": None,
+            "page_talking_count": None,
+            "page_were_here_count": None,
+        }
+
         try:
 
-            meta_description = html_content.css_first("meta[name=description]").attrs.get("content") if html_content.css_first("meta[name=description]") else None
-            
+            meta_description = (
+                html_content.css_first("meta[name=description]").attrs.get("content")
+                if html_content.css_first("meta[name=description]")
+                else None
+            )
+
             if not meta_description:
                 return meta_data
-            
+
             like_pattern = r"(?P<likes>[\d,]+)\s+likes"
             like_match = re.search(like_pattern, meta_description)
             likes = like_match.group("likes") if like_match else None
@@ -257,12 +281,11 @@ class PageInfo:
             meta_data["page_likes_count"] = likes
             meta_data["page_talking_count"] = talking
             meta_data["page_were_here_count"] = were
-            
+
             return meta_data
-        
+
         except Exception as e:
-            print(
-                f"Unexpected error in (extract_html_data) func: {e}")
+            print(f"Unexpected error in (extract_html_data) func: {e}")
             return meta_data
 
     @classmethod
