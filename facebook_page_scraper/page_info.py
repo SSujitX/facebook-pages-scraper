@@ -85,6 +85,7 @@ class PageInfo:
             "page_name": None,
             "page_url": None,
             "profile_pic": None,
+            "cover_photo": None,
             "page_likes": None,
             "page_followers": None,
             "page_id" : None,
@@ -113,12 +114,14 @@ class PageInfo:
                     general_info["page_id"] = user.get("delegate_page", {}).get("id")
                     
                     general_info["is_business_page"] = user.get("delegate_page", {}).get("is_business_page_active")
-                    
+
                     general_info["profile_pic"] = (
                         user.get("profilePicLarge", {}).get("uri")
                         or user.get("profilePicMedium", {}).get("uri")
                         or user.get("profilePicSmall", {}).get("uri")
                     )
+                    
+                    general_info["cover_photo"] = user.get("cover_photo", {}).get("photo", {}).get("image",{}).get("uri")
 
                     profile_social_contents = user.get(
                         "profile_social_context", {}
