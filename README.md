@@ -14,11 +14,10 @@ If you find this package useful, please support the project by giving it a star 
 
 ## Update
 
-- **Version 0.0.3**:
-  - **Updated**: Added extraction of additional data such as (cover photo).
-  - **Improved**: Enhanced error handling.
-  - **Added**: Initialization of PagePostInfo.
-  - **New Contributor**: @olivier-saugeon made their first contribution.
+- **Version 0.0.4**:
+  - **Fixed**: Improved error handling for missing user data in page_info.py.
+  - **Fixed**: Added proper null checks for delegate_page and profile_social_context.
+  - **Improved**: Enhanced robustness against Facebook API structure changes.
 
 ### Features:
 
