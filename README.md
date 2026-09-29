@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/master/assets/facebook_pages_scraper.jpg" alt="Facebook Pages Scraper">
+  <img src="https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/master/assets/facebook_pages_scraper.jpg?v=2" alt="Facebook Pages Scraper">
 </p>
 
 # Facebook Pages Scraper
