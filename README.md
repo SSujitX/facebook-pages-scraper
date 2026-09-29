@@ -1,156 +1,199 @@
-[![PyPI version](https://badge.fury.io/py/facebook-pages-scraper.svg)](https://badge.fury.io/py/facebook-pages-scraper)
-[![Python Versions](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://pypi.org/project/facebook-pages-scraper/)
-[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper)](https://pepy.tech/project/facebook-pages-scraper)
-[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/month)](https://pepy.tech/project/facebook-pages-scraper)
-[![Downloads](https://static.pepy.tech/badge/facebook-pages-scraper/week)](https://pepy.tech/project/facebook-pages-scraper)
+<p align="center">
+  <a href="https://badge.fury.io/py/facebook-pages-scraper"><img src="https://badge.fury.io/py/facebook-pages-scraper.svg" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/facebook-pages-scraper/"><img src="https://img.shields.io/badge/python-%3E%3D3.11-blue" alt="Python >=3.11"></a>
+  <a href="https://pepy.tech/project/facebook-pages-scraper"><img src="https://static.pepy.tech/badge/facebook-pages-scraper" alt="Downloads"></a>
+  <a href="https://pepy.tech/project/facebook-pages-scraper"><img src="https://static.pepy.tech/badge/facebook-pages-scraper/week" alt="Downloads this week"></a>
+</p>
 
-# Facebook Page Scraper
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/main/assets/facebook_pages_scraper.jpg" alt="Facebook Pages Scraper">
+</p>
 
-**Facebook Page Scraper** is a Python client package/library that helps you grab Facebook page data without the hassle. Need basic stuff like page names and profile pics? Or maybe you're after business details, follower counts, and engagement stats? This Python package does it all with minimal code. Perfect for developers looking to **scrape Facebook page info** without wasting time. This **Facebook page info scraper in Python** cuts out hours of manual work and gives you clean, ready-to-use results. It handles all kinds of pages, pulls **Facebook page information** without login headaches, and fits right into your existing projects - whether you're building a dashboard, running analysis, or keeping tabs on competitors. Found on **GitHub** and PyPI, our **Facebook page scraper** is straightforward enough for newcomers but packed with features that make **Facebook data extraction** a breeze for seasoned coders too.
+# Facebook Pages Scraper
 
-If you find this package useful, please support the project by giving it a star on [GitHub](https://github.com/SSujitX/facebook-pages-scraper). Your support helps in maintaining and enhancing the project!
+Facebook Pages Scraper reads public Facebook page info and the latest post without a browser or an API key. If you find it useful, please support the package by hitting the star on GitHub. Your support helps keep the project going.
 
-## Update
+Use **facebook-pages-scraper** for a page name, intro, about text, contact fields, and the latest post. A string returns one result. A list returns one result per page. Works with `pip install facebook-pages-scraper` or `uv add facebook-pages-scraper` on Python 3.11+.
 
-- **Version 0.0.4**:
-  - **Fixed**: Improved error handling for missing user data in page_info.py.
-  - **Fixed**: Added proper null checks for delegate_page and profile_social_context.
-  - **Improved**: Enhanced robustness against Facebook API structure changes.
+<details>
+<summary><strong>Looking for a sponsor</strong></summary>
 
-### Features:
+<a href="mailto:ssujitxx@gmail.com">ssujitxx@gmail.com</a>
+</details>
 
-- **Page Name & URL Extraction**: Easily extract the name and URL of the Facebook page
-- **Profile Picture Access**: Get high-quality profile picture URLs
-- **Basic Metrics**: Extract likes, followers, talking count, and check-ins
-- **Page Identity**: Get page ID and business page status
-- **Detailed Statistics**: Access precise counts for likes, engagements, and visitor metrics
-- **Business Information**:
-  - Category and classification
-  - Physical address
-  - Contact details (phone and email)
-  - Website URL
-  - Operating hours
-  - Price range indicators
-  - Available services
-- **Rating Information**: Access page ratings when available
-- **Social Media Integration**: Retrieve connected social media accounts
-- **Simple Integration**: Easy to integrate into any Python project
+## Demo
+
+![Scrape a Facebook page](https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/main/assets/facebook-pages-scraper.gif)
+
+## How it works
+
+The package fetches the public page HTML with a Chrome-like client, then reads the JSON Facebook embeds in that document.
+
+Page info comes from the profile header and intro cards. Address, the About paragraph, page id, and creation date come from the About tab. The first HTML document includes only the latest post.
+
+Accepted input:
+
+- `bbcnews`
+- `https://www.facebook.com/bbcnews`
+- `https://web.facebook.com/bbcnews`
+- `https://m.facebook.com/bbcnews`
+
+`pizzaburgbd` is a public page that fills the About fields: intro, about text, address, phone, email, website, hours, services, Instagram, owner, page id, and creation date. Use it when you want a test run to show a full result. Page likes and the Monday–Sunday hours grid are still absent, because Facebook does not put them in this HTML.
+
+A string returns one dict (or one list of posts). A list returns one result per page, in order. A failed page is `None`.
+
+`page_social_accounts` is a map of network to link, for example `{"Instagram": "https://www.instagram.com/meta"}`. Page likes are often missing from the public HTML. `page_business_hours` is the open/closed line Facebook sends with the page, not the Monday–Sunday grid.
 
 ## Installation
 
-- You can install this package using pip:
+```sh
+uv add facebook-pages-scraper
+```
 
 ```sh
 pip install facebook-pages-scraper
 ```
 
-- You can upgrade this package using pip (upgrade to the latest version):
-
 ```sh
 pip install facebook-pages-scraper --upgrade
 ```
 
-- Using uv:
+This repo uses [uv](https://docs.astral.sh/uv/):
 
 ```sh
-uv add facebook-pages-scraper -U
+uv sync --group dev
+```
+
+## Parameters
+
+| Parameter | Default | What it is |
+|---|---|---|
+| `url` | required | One page URL or username, or a list of them. |
+| `proxy` | `None` | Optional HTTP/HTTPS/SOCKS5 proxy if this IP is rate-limited. |
+| `concurrency` | `4` | **Async list only.** Max pages fetched at once. |
+
+`proxy` stays `None` unless you need one. Examples:
+
+```text
+http://user:pass@host:port
+https://host:port
+socks5://user:pass@host:port
 ```
 
 ## Usage
 
-### Scraping General Page Information
-
-The following example demonstrates how to scrape general information from a Facebook page using the `FacebookPageScraper` class.
+### Sync — `PageInfo`
 
 ```python
 from facebook_page_scraper import FacebookPageScraper
-from rich.pretty import pprint
+
 
 def main():
-    url = "https://www.facebook.com/pizzaburgbd"
+    # Optional. Examples:
+    #   proxy = "http://user:pass@host:port"
+    #   proxy = "https://host:port"
+    #   proxy = "socks5://user:pass@host:port"
+    proxy = None
 
-    pprint(f">= Scraping URL/Username: {url}")
+    url = "https://web.facebook.com/pizzaburgbd"
 
-    page_info = FacebookPageScraper.PageInfo(url)
-    pprint("Page Information:")
-    pprint(page_info)
-    pprint("=" * 80)
+    try:
+        page = FacebookPageScraper.PageInfo(url, proxy=proxy)
+        if page:
+            print(page)
+        else:
+            print("Error: no page data")
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()
 ```
 
-### Using a for loop to scrape multiple URLs
+### Async — `PageInfoAsync`
 
 ```python
+import asyncio
+
 from facebook_page_scraper import FacebookPageScraper
-from rich.pretty import pprint
-import time
+
 
 def main():
+    # Optional. Examples:
+    #   proxy = "http://user:pass@host:port"
+    #   proxy = "https://host:port"
+    #   proxy = "socks5://user:pass@host:port"
+    proxy = None
+
+    url = "https://web.facebook.com/pizzaburgbd"
+
+    try:
+        page = asyncio.run(FacebookPageScraper.PageInfoAsync(url, proxy=proxy))
+        if page:
+            print(page)
+        else:
+            print("Error: no page data")
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Async batch
+
+Pass a list. Up to `concurrency` pages run at once.
+
+```python
+import asyncio
+
+from facebook_page_scraper import FacebookPageScraper
+
+
+def main():
+    # Optional. Examples:
+    #   proxy = "http://user:pass@host:port"
+    #   proxy = "https://host:port"
+    #   proxy = "socks5://user:pass@host:port"
+    proxy = None
+
     urls = [
-        "/instagram",
-        "https://www.facebook.com/facebook",
-        "https://www.facebook.com/MadKingXGaming/",
-        "https://www.facebook.com/LinkedIn",
-        "https://www.facebook.com/pizzaburgbd"
+        "https://web.facebook.com/pizzaburgbd",
+        "https://web.facebook.com/NASA",
+        "https://web.facebook.com/Meta",
     ]
 
-    for url in urls:
-        pprint(f">= Scraping URL/Username: {url}")
-
-        page_info = FacebookPageScraper.PageInfo(url)
-        pprint("Page Information:")
-        pprint(page_info)
-        pprint("=" * 80)
-        time.sleep(2)
+    try:
+        pages = asyncio.run(
+            FacebookPageScraper.PageInfoAsync(urls, concurrency=4, proxy=proxy)
+        )
+        for page in pages:
+            if page:
+                print("Page:", page["page_name"])
+            else:
+                print("Error: no page data")
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 if __name__ == "__main__":
     main()
 ```
 
-### Possible output
+`FacebookPageScraper.PageInfo(urls)` also accepts a list (sync, one page after another). For many pages, async batch is the better call.
 
-```sh
-{
-│   'page_name': 'PizzaBurg',
-│   'page_url': 'https://www.facebook.com/pizzaburgbd',
-│   'profile_pic': 'https://scontent.fdac22-2.fna.fbcdn.net/v/t39.30808-1/461120046_932810008890332_7328117254384510587_n.jpg?stp=cp6_dst-jpg_s200x200_tt6&_nc_cat=1&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=lMP1pZatZ90Q7kNvgEBx2nl&_nc_oc=AdhqTswSuZ36AUvf955zvso4FUy1qUvAUsTwzwik8lijO-NNmFLmxAhqyDFtGI-rllw&_nc_zt=24&_nc_ht=scontent.fdac22-2.fna&_nc_gid=ADEDzW-U1qvrumGbDCHzumc&oh=00_AYAo2NWsmCr_qa0IZc3Nwj_7K_-DVrgkuidp1PGhvXcFjg&oe=67B3145F',
-│   'page_likes': '412K likes',
-│   'page_followers': '614K followers',
-│   'page_id': '1156899667774877',
-│   'is_business_page': True,
-│   'page_likes_count': '412,723',
-│   'page_talking_count': '26,076',
-│   'page_were_here_count': '64,824',
-│   'page_category': 'Page · Fast food restaurant',
-│   'page_address': 'Avenue Road Section:2 , Block: A, Avenue:1 , House: 12/1, Dhaka 1216, Dhaka, Bangladesh',
-│   'page_phone': '01404-461200',
-│   'page_email': 'pizzaburgofficial@gmail.com',
-│   'page_website': 'pizzaburg.com',
-│   'page_business_hours': 'Closed now',
-│   'page_business_price': 'Price range · £',
-│   'page_rating': None,
-│   'page_services': 'Dine in · In-store collection',
-│   'page_social_accounts': None
-}
-```
+`PagePostInfo` and `PagePostInfoAsync` take the same `url`, `proxy`, and `concurrency` arguments. A string returns the latest post as a one-item list. A list of pages returns a list of those lists.
 
-# Disclaimer
-
-⚠️ Important Notice
+## Disclaimer
 
 Facebook's Terms of Service and Community Standards prohibit unauthorized scraping of their platform. This package is intended for educational purposes, and you should use it in compliance with Facebook's policies. Unauthorized scraping or accessing Facebook data without permission can result in legal consequences or a permanent ban from the platform.
 
-By using Facebook Page Scraper, you acknowledge that:
-
-You have the right and permission to access the data you are scraping.
-You are solely responsible for how you use this package and for any consequences that may arise.
-The developers of this tool are not liable for any misuse, and it is your responsibility to ensure compliance with Facebook's rules and regulations.
+By using Facebook Pages Scraper, you acknowledge that you have the right to access the data you are scraping, and that you are solely responsible for how you use this package. The developers of this tool are not liable for any misuse.
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/chart?repos=SSujitX/facebook-pages-scraper&type=date&legend=top-left&sealed_token=B4YLot1P-IIlvJ98r7p7hM9O1e8oUA3XPtevpc011R4Zzwv_FSyAxK5y596wURJ3SLg7vYApWqwucWdS3jtkmLfWHvWM9Wa0rzyILK4VEnES5SuyQIXrRM-yji4pEkjvIkZTgExlk8LZH5UFXxLfvWJMjPS30bWvuFFGhsD5Coi4KPS2CHrL2qhTx9LC)](https://www.star-history.com/?repos=SSujitX%2Ffacebook-pages-scraper&type=date&legend=top-left)
 
-![](https://api.visitorbadge.io/api/VisitorHit?user=SSujitX&facebook-pages-scraper&countColor=%237B1E7A)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FSSujitX%2Ffacebook-pages-scraper&countColor=%23263759&labelStyle=upper)
