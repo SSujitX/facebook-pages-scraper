@@ -1,44 +1,257 @@
-name: Upload Python Package
+# PyPI trusted publishing must match this path: .github/workflows/python-publish.yml
+# Actions → Release → Run workflow → bump = current | patch | minor | major
+#
+# Version lives in pyproject.toml only. Notes come from conventional commits
+# (Features, Fixes, Docs, …). No RELEASE.md.
+#
+# Dispatch:
+#   1. Next X.Y.Z from pyproject.toml + bump
+#   2. Writes pyproject.toml + uv.lock
+#   3. Tests, builds, commits, tags vX.Y.Z
+#   4. PyPI (OIDC) + GitHub Release with wheels
+# Tag push (vX.Y.Z) still publishes that existing version.
+
+name: Release
+run-name: "Release (${{ inputs.bump || github.ref_name }})"
 
 on:
-  # Trigger the workflow only on tag pushes with version patterns
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Bump from pyproject.toml. Use current to publish the file as-is.
+        required: true
+        type: choice
+        options:
+          - current
+          - patch
+          - minor
+          - major
+        default: patch
+      prerelease:
+        description: Mark GitHub Release as prerelease
+        required: false
+        type: boolean
+        default: false
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"      # Stable versions (e.g., 1.0.0)
-      - "[0-9]+.[0-9]+.[0-9]+a[0-9]+"  # Alpha versions (e.g., 1.0.0a1)
-      - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"  # Beta versions (e.g., 1.0.0b1)
-      - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+" # Release candidates (e.g., 1.0.0rc1)
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 permissions:
-  contents: read       # Required to read repository contents
-  id-token: write      # Required for trusted publishing with OIDC
+  contents: write
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Publish to PyPI
+  publish:
+    name: Test, PyPI, and GitHub Release
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # Step 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
-          python-version: "3.12"
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: true
 
-      # Step 3: Upgrade pip and install dependencies
-      - name: Install dependencies
+      - name: Fetch tags
+        run: git fetch --tags --force origin
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          python-version: "3.14"
+
+      - name: Choose next version
+        if: github.event_name == 'workflow_dispatch'
+        id: bump
+        shell: bash
         run: |
-          python -m pip install --upgrade pip
-          pip install build
+          set -euo pipefail
+          BUMP="${{ github.event.inputs.bump }}"
+          CURRENT="$(uv run python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          print(tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"])
+          PY
+          )"
+          if [[ ! "$CURRENT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "pyproject version must be X.Y.Z (got '$CURRENT')" >&2
+            exit 1
+          fi
+          IFS=. read -r MAJOR MINOR PATCH <<<"$CURRENT"
+          case "$BUMP" in
+            current) VER="$CURRENT" ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              VER="${MAJOR}.${MINOR}.${PATCH}"
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              VER="${MAJOR}.${MINOR}.${PATCH}"
+              ;;
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              VER="${MAJOR}.${MINOR}.${PATCH}"
+              ;;
+            *)
+              echo "unknown bump '$BUMP'" >&2
+              exit 1
+              ;;
+          esac
+          TAG="v${VER}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "tag ${TAG} already exists" >&2
+            exit 1
+          fi
+          PREV_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          {
+            echo "current=${CURRENT}"
+            echo "version=${VER}"
+            echo "tag=${TAG}"
+            echo "bump=${BUMP}"
+            echo "previous_tag=${PREV_TAG}"
+          } >>"$GITHUB_OUTPUT"
+          echo "bump ${BUMP}: ${CURRENT} -> ${VER} (tag ${TAG}; previous=${PREV_TAG:-none})"
 
-      # Step 4: Build the Python package
-      - name: Build package
-        run: python -m build
+      - name: Write version into pyproject.toml
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          VER: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          uv run python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
 
-      # Step 5: Publish the package to PyPI using trusted publishing
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+          ver = os.environ["VER"]
+          path = Path("pyproject.toml")
+          text, n = re.subn(
+              r'(?m)^version = "[^"]+"',
+              f'version = "{ver}"',
+              path.read_text(encoding="utf-8"),
+              count=1,
+          )
+          if n != 1:
+              raise SystemExit("failed to update pyproject.toml version")
+          path.write_text(text, encoding="utf-8")
+          PY
+          uv lock
+
+      - name: Sync dependencies
+        run: uv sync --frozen --group dev
+
+      - name: Unit tests
+        run: uv run pytest
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ steps.bump.outputs.version }}"
+            TAG="${{ steps.bump.outputs.tag }}"
+            PREV="${{ steps.bump.outputs.previous_tag }}"
+            BUMP="${{ steps.bump.outputs.bump }}"
+            CURRENT="${{ steps.bump.outputs.current }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+            VERSION="${TAG#v}"
+            PREV="$(git describe --tags --abbrev=0 --exclude "$TAG" 2>/dev/null || true)"
+            BUMP=""
+            CURRENT="$VERSION"
+          fi
+          PY_VERSION="$(uv run python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          print(tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"])
+          PY
+          )"
+          if [[ "$VERSION" != "$PY_VERSION" ]]; then
+            echo "::error::Version $VERSION does not match pyproject.toml $PY_VERSION"
+            exit 1
+          fi
+          {
+            echo "version=$VERSION"
+            echo "tag=$TAG"
+            echo "previous_tag=$PREV"
+            echo "bump=$BUMP"
+            echo "current=$CURRENT"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Record version in git
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VER="${{ steps.version.outputs.version }}"
+          TAG="${{ steps.version.outputs.tag }}"
+          BUMP="${{ steps.bump.outputs.bump }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml uv.lock
+          if git diff --cached --quiet; then
+            echo "version already at ${VER}; no package commit needed"
+          else
+            git commit -m "chore(release): ${TAG} [skip ci]"
+          fi
+          git push origin "HEAD:${{ github.ref_name }}"
+          git tag -a "${TAG}" -m "facebook-pages-scraper ${TAG}"
+          git push origin "${TAG}"
+
+      - name: Build
+        run: uv build
+
+      - name: Smoke test wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          WHEEL=$(ls dist/facebook_pages_scraper-*.whl | head -n 1)
+          uv run --isolated --no-project --with "$WHEEL" python -c \
+            "import facebook_page_scraper; from facebook_page_scraper import FacebookPageScraper; assert facebook_page_scraper.__version__ == '${{ steps.version.outputs.version }}'"
+
+      - name: Publish to PyPI
+        run: uv publish
+
+      - name: Build categorized release notes
+        id: notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash .github/scripts/generate-release-notes.sh \
+            "${{ steps.version.outputs.previous_tag }}" \
+            "${{ steps.version.outputs.tag }}" \
+            "${{ steps.version.outputs.bump }}" \
+            "${{ steps.version.outputs.current }}" \
+            "${{ steps.version.outputs.version }}" \
+            >"${RUNNER_TEMP}/release-notes.md"
+          echo "path=${RUNNER_TEMP}/release-notes.md" >>"$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: facebook-pages-scraper ${{ steps.version.outputs.tag }}
+          body_path: ${{ steps.notes.outputs.path }}
+          draft: false
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || false }}
+          make_latest: true
+          generate_release_notes: false
+          fail_on_unmatched_files: true
+          files: |
+            dist/facebook_pages_scraper-*.whl
+            dist/facebook_pages_scraper-*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
