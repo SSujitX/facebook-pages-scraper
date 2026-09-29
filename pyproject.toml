@@ -1,6 +1,6 @@
 [project]
 name = "facebook-pages-scraper"
-version = "0.0.4"
+version = "0.0.5"
 description = "Scrape facebook page information without webdriver or API key."
 readme = "README.md"
 license = "MIT"
