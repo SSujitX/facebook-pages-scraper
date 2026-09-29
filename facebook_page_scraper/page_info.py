@@ -19,6 +19,10 @@ from .request_handler import RequestHandler
 from .urls import normalize_url
 
 
+def _dict(value):
+    return value if isinstance(value, dict) else {}
+
+
 class PageInfo:
     def __init__(self, url: str, handler=None, proxy: str | None = None):
         """
@@ -157,46 +161,43 @@ class PageInfo:
 
         try:
             for result in relay_results(json_data):
-                user = (
-                    result.get("data", {})
-                    .get("user", {})
-                    .get("profile_header_renderer", {})
-                    .get("user", {})
+                user = _dict(
+                    _dict(_dict(_dict(result.get("data")).get("user")).get("profile_header_renderer")).get("user")
                 )
 
                 general_info["page_name"] = user.get("name")
                 general_info["page_url"] = user.get("url")
 
                 delegate_page = user.get("delegate_page")
-                if delegate_page is not None:
+                if isinstance(delegate_page, dict):
                     general_info["page_id"] = delegate_page.get("id")
                     general_info["is_business_page"] = delegate_page.get(
                         "is_business_page_active"
                     )
 
                 general_info["profile_pic"] = (
-                    user.get("profilePicLarge", {}).get("uri")
-                    or user.get("profilePicMedium", {}).get("uri")
-                    or user.get("profilePicSmall", {}).get("uri")
+                    _dict(user.get("profilePicLarge")).get("uri")
+                    or _dict(user.get("profilePicMedium")).get("uri")
+                    or _dict(user.get("profilePicSmall")).get("uri")
                 )
 
-                general_info["cover_photo"] = (
-                    user.get("cover_photo", {})
-                    .get("photo", {})
-                    .get("image", {})
-                    .get("uri")
-                )
+                cover_photo = _dict(user.get("cover_photo"))
+                photo = _dict(cover_photo.get("photo"))
+                image = _dict(photo.get("image"))
+                general_info["cover_photo"] = image.get("uri")
                 profile_social_context = user.get("profile_social_context")
-                if profile_social_context is not None:
-                    for content in profile_social_context.get("content", []):
-                        uri = content.get("uri", "")
-                        text = content.get("text", {}).get("text")
-                        if "friends_likes" in uri and not general_info["page_likes"]:
-                            general_info["page_likes"] = text
-                        elif "followers" in uri and not general_info["page_followers"]:
-                            general_info["page_followers"] = text
-                        if general_info["page_likes"] and general_info["page_followers"]:
-                            break
+                contents = profile_social_context.get("content") if isinstance(profile_social_context, dict) else None
+                for content in contents or []:
+                    if not isinstance(content, dict):
+                        continue
+                    uri = content.get("uri") or ""
+                    text = _dict(content.get("text")).get("text")
+                    if "friends_likes" in uri and not general_info["page_likes"]:
+                        general_info["page_likes"] = text
+                    elif "followers" in uri and not general_info["page_followers"]:
+                        general_info["page_followers"] = text
+                    if general_info["page_likes"] and general_info["page_followers"]:
+                        break
             return general_info
         except (IndexError, KeyError, TypeError, ValueError) as e:
             print(f"Error extracting general page information: {e}")
@@ -231,30 +232,28 @@ class PageInfo:
 
         try:
             for result in relay_results(json_data):
-                sections = (
-                    result.get("data", {})
-                    .get("profile_tile_sections", {})
-                    .get("edges", [])
-                )
+                sections = _dict(_dict(result.get("data")).get("profile_tile_sections")).get("edges") or []
+                if not isinstance(sections, list):
+                    continue
                 for section in sections:
-                    nodes = (
-                        section.get("node", {})
-                        .get("profile_tile_views", {})
-                        .get("nodes", [])
-                    )
+                    if not isinstance(section, dict):
+                        continue
+                    nodes = _dict(_dict(section.get("node")).get("profile_tile_views")).get("nodes") or []
+                    if not isinstance(nodes, list):
+                        continue
                     for node in nodes:
-                        view_style_renderer = node.get("view_style_renderer")
-                        if not view_style_renderer:
+                        if not isinstance(node, dict):
                             continue
-                        items = (
-                            view_style_renderer.get("view", {})
-                            .get("profile_tile_items", {})
-                            .get("nodes", [])
-                        )
+                        view_style_renderer = node.get("view_style_renderer")
+                        if not isinstance(view_style_renderer, dict):
+                            continue
+                        items = _dict(_dict(view_style_renderer.get("view")).get("profile_tile_items")).get("nodes") or []
+                        if not isinstance(items, list):
+                            continue
                         for item in items:
-                            timeline_context_item = item.get("node", {}).get(
-                                "timeline_context_item", {}
-                            )
+                            if not isinstance(item, dict):
+                                continue
+                            timeline_context_item = _dict(_dict(item.get("node")).get("timeline_context_item"))
                             item_type = timeline_context_item.get(
                                 "timeline_context_list_item_type"
                             )
