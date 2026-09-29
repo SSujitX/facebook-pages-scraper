@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/main/assets/facebook_pages_scraper.jpg" alt="Facebook Pages Scraper">
+  <img src="https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/master/assets/facebook_pages_scraper.jpg" alt="Facebook Pages Scraper">
 </p>
 
 # Facebook Pages Scraper
@@ -23,7 +23,7 @@ Use **facebook-pages-scraper** for a page name, intro, about text, contact field
 
 ## Demo
 
-![Scrape a Facebook page](https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/main/assets/facebook-pages-scraper.gif)
+![Scrape a Facebook page](https://raw.githubusercontent.com/SSujitX/facebook-pages-scraper/master/assets/facebook-pages-scraper.gif)
 
 ## How it works
 
