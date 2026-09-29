@@ -8,10 +8,23 @@ def relay_results(json_data: dict):
     requires = json_data.get("require", [])
     if not requires:
         raise ValueError("Missing 'require' key in JSON data.")
-    requires = requires[0][3][0].get("__bbox", {}).get("require", [])
+    try:
+        bbox = requires[0][3][0].get("__bbox") if isinstance(requires[0][3][0], dict) else None
+    except (IndexError, TypeError, KeyError):
+        return
+    requires = (bbox or {}).get("require") or []
+    if not isinstance(requires, list):
+        return
     for require in requires:
-        if "RelayPrefetchedStreamCache" in require:
-            yield require[3][1].get("__bbox", {}).get("result", {})
+        if not isinstance(require, list) or "RelayPrefetchedStreamCache" not in require:
+            continue
+        try:
+            box = require[3][1]
+        except (IndexError, TypeError):
+            continue
+        result = ((box.get("__bbox") if isinstance(box, dict) else None) or {}).get("result")
+        if isinstance(result, dict):
+            yield result
 
 
 def text_at(obj, key: str) -> Optional[str]:
