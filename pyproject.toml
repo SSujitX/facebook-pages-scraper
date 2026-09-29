@@ -1,0 +1,48 @@
+[project]
+name = "facebook-pages-scraper"
+version = "0.0.4"
+description = "Scrape facebook page information without webdriver or API key."
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "SSujitX", email = "ssujitxx@gmail.com" }
+]
+requires-python = ">=3.11"
+keywords = [
+    "facebook",
+    "facebook-page",
+    "facebook-page-scraper",
+    "facebook-page-scraper-python",
+    "facebook-scraper",
+    "facebook-pages",
+    "facebook page scraper",
+    "scrape facebook page info",
+    "facebook data scraper", 
+    "facebook page info extractor",
+    "python facebook scraper"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "curl_cffi>=0.16.3",
+    "selectolax>=0.4.12",
+]
+[project.urls]
+Homepage = "https://github.com/SSujitX/facebook-pages-scraper"
+Documentation = "https://github.com/SSujitX/facebook-pages-scraper#readme"
+Issues = "https://github.com/SSujitX/facebook-pages-scraper/issues"
+Source = "https://github.com/SSujitX/facebook-pages-scraper"
+
+[dependency-groups]
+dev = ["rich>=15", "pytest>=8"]
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "facebook_page_scraper"
+module-root = ""
