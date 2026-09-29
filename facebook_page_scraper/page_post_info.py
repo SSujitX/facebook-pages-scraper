@@ -62,8 +62,11 @@ class PagePostInfo:
 
         try:
             for result in relay_results(json_data):
-                timeline = result.get("data", {}).get("user", {}).get("timeline_list_feed_units", {})
-                for story_node in timeline.get("edges", []):
+                timeline = _dig(result, "data", "user", "timeline_list_feed_units") or {}
+                edges = timeline.get("edges") if isinstance(timeline, dict) else None
+                for story_node in edges or []:
+                    if not isinstance(story_node, dict):
+                        continue
                     node = story_node.get("node") or {}
                     if not node:
                         continue
@@ -130,6 +133,8 @@ def _medias(attachments: list) -> list:
     found = []
     seen = set()
     for attachment in attachments:
+        if not isinstance(attachment, dict):
+            continue
         styles = (attachment.get("styles") or {}).get("attachment") or {}
         candidates = [styles.get("media"), attachment.get("media")]
         for sub in (styles.get("all_subattachments") or {}).get("nodes") or []:
