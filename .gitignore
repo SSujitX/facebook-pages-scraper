@@ -13,3 +13,6 @@ build/
 *.egg-info/
 facebook_page_scraper.py
 test.py
+.pytest_cache/
+
+.cursor/hooks/
