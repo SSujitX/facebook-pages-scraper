@@ -27,6 +27,17 @@ def relay_results(json_data: dict):
             yield result
 
 
+def walk(obj):
+    """Yield obj and every dict or list nested under it."""
+    yield obj
+    if isinstance(obj, dict):
+        for value in obj.values():
+            yield from walk(value)
+    elif isinstance(obj, list):
+        for value in obj:
+            yield from walk(value)
+
+
 def text_at(obj, key: str) -> Optional[str]:
     """First `{key: {"text": "..."}}` found anywhere under obj."""
     if isinstance(obj, dict):

@@ -11,9 +11,9 @@
 
 # Facebook Pages Scraper
 
-Facebook Pages Scraper reads public Facebook page info and the latest post without a browser or an API key. If you find it useful, please support the package by hitting the star on GitHub. Your support helps keep the project going.
+Facebook Pages Scraper reads public Facebook page info and posts without a browser or an API key. If you find it useful, please support the package by hitting the star on GitHub. Your support helps keep the project going.
 
-Use **facebook-pages-scraper** for a page name, intro, about text, contact fields, and the latest post. A string returns one result. A list returns one result per page. Works with `pip install facebook-pages-scraper` or `uv add facebook-pages-scraper` on Python 3.11+.
+Use **facebook-pages-scraper** for a page name, intro, about text, contact fields, and posts. A string returns one result. A list returns one result per page. Works with `pip install facebook-pages-scraper` or `uv add facebook-pages-scraper` on Python 3.11+.
 
 <details>
 <summary><strong>Looking for a sponsor</strong></summary>
@@ -29,7 +29,7 @@ Use **facebook-pages-scraper** for a page name, intro, about text, contact field
 
 The package fetches the public page HTML with a Chrome-like client, then reads the JSON Facebook embeds in that document.
 
-Page info comes from the profile header and intro cards. Address, the About paragraph, page id, and creation date come from the About tab. The first HTML document includes only the latest post.
+Page info comes from the profile header and intro cards. Address, the About paragraph, page id, and creation date come from the About tab. The page HTML preloads only the latest post. For more, the scraper re-sends the timeline query found in that HTML, 40 posts per request, stepping back in time until it reaches `max_posts`, `since`, or the page's first post.
 
 Accepted input:
 
@@ -71,6 +71,9 @@ uv sync --group dev
 | `url` | required | One page URL or username, or a list of them. |
 | `proxy` | `None` | Optional HTTP/HTTPS/SOCKS5 proxy if this IP is rate-limited. |
 | `concurrency` | `4` | **Async list only.** Max pages fetched at once. |
+| `max_posts` | `1` | **Posts only.** Most posts per page, newest first. `1` reads just the page HTML. `None` means every post. |
+| `since` | `None` | **Posts only.** Skip posts older than this `date`, `datetime`, ISO string (`"2026-01-01"`), or unix time. UTC. |
+| `save_to` | `None` | Optional file path. The result is also written there as UTF-8 JSON. Folders are created. A failed page (`None`) is not written. |
 
 `proxy` stays `None` unless you need one. Examples:
 
@@ -184,7 +187,40 @@ if __name__ == "__main__":
 
 `FacebookPageScraper.PageInfo(urls)` also accepts a list (sync, one page after another). For many pages, async batch is the better call.
 
-`PagePostInfo` and `PagePostInfoAsync` take the same `url`, `proxy`, and `concurrency` arguments. A string returns the latest post as a one-item list. A list of pages returns a list of those lists.
+`PagePostInfo` and `PagePostInfoAsync` take the same `url`, `proxy`, `concurrency`, and `save_to` arguments, plus `max_posts` and `since`. A string returns one list of posts. A list of pages returns a list of those lists.
+
+### Posts
+
+```python
+from facebook_page_scraper import FacebookPageScraper
+
+# Latest post only (one request)
+FacebookPageScraper.PagePostInfo("lgucabanatuan")
+
+# Latest 100 posts
+FacebookPageScraper.PagePostInfo("lgucabanatuan", max_posts=100)
+
+# Every post since a date, saved to a file
+FacebookPageScraper.PagePostInfo(
+    "lgucabanatuan", max_posts=None, since="2026-07-01",
+    save_to="output/lgucabanatuan/posts.json",
+)
+```
+
+Each request returns up to 40 posts and takes about 4 MB, with a 1 second pause between requests. A page with years of daily posts can mean hundreds of requests, so set `since` or `max_posts` unless you need the full history. If a request fails partway, you get the posts collected so far. A shared post with no caption of its own has `text: null`.
+
+### Save to a file
+
+Pass `save_to` to any call. The result is still returned.
+
+```python
+from facebook_page_scraper import FacebookPageScraper
+
+FacebookPageScraper.PageInfo("lgucabanatuan", save_to="output/lgucabanatuan/page_info.json")
+FacebookPageScraper.PagePostInfo("lgucabanatuan", save_to="output/lgucabanatuan/posts.json")
+```
+
+A list of pages saves one JSON array in input order, with `null` for a failed page. Image links in the saved file are signed by Facebook and expire after a few days.
 
 ## Disclaimer
 

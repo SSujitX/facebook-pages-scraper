@@ -16,3 +16,5 @@ test.py
 .pytest_cache/
 
 .cursor/hooks/
+
+output/
