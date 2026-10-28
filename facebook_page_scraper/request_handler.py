@@ -1,7 +1,7 @@
 # facebook_page_scraper/request_handler.py
 
 import curl_cffi
-from selectolax.parser import HTMLParser
+from selectolax.lexbor import LexborHTMLParser
 import json
 
 class RequestHandler:
@@ -16,7 +16,7 @@ class RequestHandler:
         try:
             response = self.session.get(url, headers=self.headers)
             response.raise_for_status()
-            return HTMLParser(response.text)
+            return LexborHTMLParser(response.text)
         except Exception as e:
             print(f"Error fetching the page [{url}]: {e}")
             return None
@@ -27,7 +27,7 @@ class RequestHandler:
         if session is not None:
             session.close()
 
-    def find_json(self, html_content: HTMLParser, key_to_find: str) -> dict | None:
+    def find_json(self, html_content: LexborHTMLParser, key_to_find: str) -> dict | None:
         """Return the first JSON script containing key_to_find, or None."""
         if html_content is None:
             return None
@@ -53,7 +53,7 @@ class AsyncRequestHandler(RequestHandler):
         try:
             response = await self.session.get(url, headers=self.headers)
             response.raise_for_status()
-            return HTMLParser(response.text)
+            return LexborHTMLParser(response.text)
         except Exception as e:
             print(f"Error fetching the page [{url}]: {e}")
             return None
