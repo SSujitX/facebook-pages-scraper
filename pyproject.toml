@@ -28,7 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "curl_cffi>=0.16.3",
-    "selectolax>=0.4.12",
+    "selectolax==1.0.2",
 ]
 [project.urls]
 Homepage = "https://github.com/SSujitX/facebook-pages-scraper"
