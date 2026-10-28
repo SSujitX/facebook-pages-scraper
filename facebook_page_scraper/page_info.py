@@ -4,7 +4,7 @@ import asyncio
 import re
 from typing import Optional, Dict
 
-from selectolax.parser import HTMLParser
+from selectolax.lexbor import LexborHTMLParser
 
 from .about_pages import (
     about_address,
@@ -307,7 +307,7 @@ class PageInfo:
             "threads.net": "Threads",
         }.get(host, host)
 
-    def extract_html_data(self, html_content: HTMLParser) -> Dict[str, Optional[str]]:
+    def extract_html_data(self, html_content: LexborHTMLParser) -> Dict[str, Optional[str]]:
         """Extracts like, talking, and were-here counts from the meta description."""
         meta_data = {
             "page_likes_count": None,
