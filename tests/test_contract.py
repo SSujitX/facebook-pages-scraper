@@ -1,6 +1,6 @@
 import asyncio
 
-from selectolax.parser import HTMLParser
+from selectolax.lexbor import LexborHTMLParser
 
 from facebook_page_scraper import FacebookPageScraper
 from facebook_page_scraper.page_info import PageInfo
@@ -21,7 +21,7 @@ def test_normalize_url():
 def test_find_json_and_missing_key():
     handler = RequestHandler()
     try:
-        html = HTMLParser(
+        html = LexborHTMLParser(
             '<script type="application/json">{"username_for_profile": 1}</script>'
         )
         assert handler.find_json(html, "username_for_profile")["username_for_profile"] == 1
